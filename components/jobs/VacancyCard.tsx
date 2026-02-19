@@ -1,25 +1,21 @@
 'use client'
 
 import Link from 'next/link'
-import { MapPin, DollarSign, Clock, Bookmark, BookmarkCheck } from 'lucide-react'
+import { MapPin, Clock, Bookmark, BookmarkCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Vacancy } from '@/lib/types'
 
 interface VacancyCardProps {
   vacancy: any
   isSaved?: boolean
   onSaveToggle?: (vacancyId: string) => void
-  variant?: 'default' | 'compact'
 }
 
 export function VacancyCard({
   vacancy,
   isSaved = false,
   onSaveToggle,
-  variant = 'default',
 }: VacancyCardProps) {
-  const isCompact = variant === 'compact'
   const formatSalary = (min?: number, max?: number) => {
     if (!min && !max) return 'Зарплата не указана'
     if (!min) return `до ${max} ₽`
@@ -37,12 +33,10 @@ export function VacancyCard({
       if (days === 0) return 'Сегодня'
       if (days === 1) return 'Вчера'
       if (days < 7) return `${days} дн. назад`
-      if (days < 30) return `${Math.floor(days / 7)} нед. назад`
       
       return date.toLocaleDateString('ru-RU', {
-        month: 'short',
+        month: 'long',
         day: 'numeric',
-        year: 'numeric',
       })
     } catch {
       return 'Недавно'
@@ -50,88 +44,67 @@ export function VacancyCard({
   }
 
   return (
-    <Link href={`/vacancies/${vacancy.id}`}>
-      <div
-        className="rounded-xl border border-gray-200 bg-white p-6 transition-all duration-300 hover:shadow-xl hover:border-primary/30 hover:bg-gray-50 cursor-pointer"
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-bold text-foreground hover:text-primary transition-colors line-clamp-2">
+    <div className="group relative bg-white border border-gray-200 rounded-lg p-5 hover:shadow-md transition-shadow">
+      <div className="flex justify-between items-start gap-4">
+        <div className="flex-1">
+          <Link href={`/vacancies/${vacancy.id}`} className="block">
+            <h3 className="text-lg font-bold text-[#11a36d] hover:underline mb-1">
               {vacancy.title}
             </h3>
-
-            <p className="text-sm text-muted-foreground mt-2 line-clamp-1">
-              {vacancy.company_name || 'Компания не указана'}
-            </p>
-
-            {/* Key info row */}
-            <div className="flex flex-wrap gap-4 mt-5">
-              {(vacancy.salary_min || vacancy.salary_max) && (
-                <div className="flex items-center gap-2 text-lg font-bold text-primary">
-                  <span>₽</span>
-                  <span>{formatSalary(vacancy.salary_min, vacancy.salary_max)}</span>
-                </div>
-              )}
-              {vacancy.location && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin className="w-4 h-4" />
-                  <span>{vacancy.location}</span>
-                </div>
-              )}
-            </div>
-
-            {!isCompact && (
-              <>
-                {vacancy.description && (
-                  <p className="text-sm text-muted-foreground mt-4 line-clamp-2">
-                    {vacancy.description}
-                  </p>
-                )}
-
-                {vacancy.employment_type && (
-                  <div className="mt-4">
-                    <Badge className="bg-blue-100 text-primary hover:bg-blue-200">
-                      {vacancy.employment_type}
-                    </Badge>
-                  </div>
-                )}
-              </>
-            )}
-
-            <div className="flex items-center gap-4 mt-5 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5" />
-                {formatDate(vacancy.created_at)}
-              </span>
-              {vacancy.applications_count && (
-                <span className="px-2 py-1 bg-gray-100 rounded text-gray-700 font-medium">
-                  {vacancy.applications_count} откликов
-                </span>
-              )}
-            </div>
+          </Link>
+          
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-sm font-semibold text-gray-700">
+              {vacancy.company_name}
+            </span>
           </div>
 
+          <div className="flex flex-wrap gap-y-2 gap-x-4 mb-4">
+            <div className="text-lg font-bold text-gray-900">
+              {formatSalary(vacancy.salary_min, vacancy.salary_max)}
+            </div>
+            {vacancy.location && (
+              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                <MapPin className="w-4 h-4" />
+                {vacancy.location}
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Badge variant="secondary" className="bg-[#f0f9f4] text-[#11a36d] border-none font-normal">
+              {vacancy.employment_type === 'full_time' ? 'Полная занятость' : 
+               vacancy.employment_type === 'part_time' ? 'Частичная занятость' : 
+               vacancy.employment_type === 'contract' ? 'Контракт' : 
+               vacancy.employment_type === 'freelance' ? 'Фриланс' : 'Стажировка'}
+            </Badge>
+            <span className="text-xs text-muted-foreground flex items-center gap-1">
+              <Clock className="w-3.5 h-3.5" />
+              {formatDate(vacancy.created_at)}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2">
           {onSaveToggle && (
             <Button
               variant="ghost"
               size="icon"
               onClick={(e) => {
                 e.preventDefault()
-                e.stopPropagation()
-                onSaveToggle(vacancy.id)
+                onSaveToggle(vacancy.id.toString())
               }}
-              className="flex-shrink-0 mt-1 hover:bg-blue-100 transition-colors"
-              title={isSaved ? 'Убрать из сохранённых' : 'Сохранить'}
+              className="text-gray-400 hover:text-[#11a36d]"
             >
               {isSaved ? (
-                <BookmarkCheck className="w-5 h-5 text-primary fill-primary" />
+                <BookmarkCheck className="w-5 h-5 text-[#11a36d] fill-[#11a36d]" />
               ) : (
-                <Bookmark className="w-5 h-5 text-gray-400 hover:text-primary" />
+                <Bookmark className="w-5 h-5" />
               )}
             </Button>
           )}
         </div>
       </div>
-    </Link>
+    </div>
   )
 }

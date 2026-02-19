@@ -4,6 +4,11 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   allowedDevOrigins: ['*'],
+  experimental: {
+    serverActions: {
+      allowedOrigins: ['*'],
+    },
+  },
   async rewrites() {
     return [
       {

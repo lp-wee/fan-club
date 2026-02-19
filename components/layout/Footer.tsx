@@ -1,126 +1,86 @@
+'use client'
+
 import Link from 'next/link'
-import { Separator } from '@/components/ui/separator'
+import { ROUTES } from '@/lib/utils/constants'
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
 
+  const sections = [
+    {
+      title: 'Для соискателей',
+      links: [
+        { label: 'Все вакансии', href: ROUTES.VACANCIES },
+        { label: 'Кабинет', href: ROUTES.CABINET_DASHBOARD },
+        { label: 'Мои резюме', href: ROUTES.CABINET_RESUMES },
+        { label: 'Советы по поиску', href: '#' },
+      ],
+    },
+    {
+      title: 'Для работодателей',
+      links: [
+        { label: 'Разместить вакансию', href: ROUTES.EMPLOYER_VACANCY_NEW },
+        { label: 'Поиск резюме', href: ROUTES.EMPLOYER_RESUMES },
+        { label: 'Тарифы', href: '#' },
+        { label: 'Помощь', href: '#' },
+      ],
+    },
+    {
+      title: 'О проекте',
+      links: [
+        { label: 'О нас', href: '#' },
+        { label: 'Контакты', href: '#' },
+        { label: 'Правила сервиса', href: '#' },
+        { label: 'Конфиденциальность', href: '#' },
+      ],
+    },
+  ]
+
   return (
-    <footer className="border-t border-border bg-muted">
-      <div className="container max-w-7xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-          {/* Brand */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold">
-                JP
+    <footer className="bg-[#222] text-white pt-16 pb-8 border-t border-gray-800">
+      <div className="container max-w-7xl mx-auto px-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+          {/* Logo & Info */}
+          <div className="space-y-6">
+            <Link href={ROUTES.HOME} className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded bg-[#11a36d] flex items-center justify-center text-white">
+                <span className="font-bold">JP</span>
               </div>
-              <span className="font-bold text-lg">JobPortal</span>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Крупнейшая платформа поиска работы, объединяющая талантливых специалистов
-              с ведущими компаниями по всему миру.
+              <span className="font-bold text-xl tracking-tight">JobPortal</span>
+            </Link>
+            <p className="text-gray-400 text-sm leading-relaxed">
+              Современная платформа для поиска работы и сотрудников в России. Мы делаем процесс найма проще и быстрее.
             </p>
           </div>
 
-          {/* For Job Seekers */}
-          <div>
-            <h3 className="font-semibold mb-4">Для соискателей</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/vacancies" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Просмотреть вакансии
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Поиск компаний
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Карьерные советы
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Справочник зарплат
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* For Employers */}
-          <div>
-            <h3 className="font-semibold mb-4">Для работодателей</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Разместить вакансию
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Поиск резюме
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Цены
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Возможности
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Resources */}
-          <div>
-            <h3 className="font-semibold mb-4">Ресурсы</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  О нас
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Контакты
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Политика конфиденциальности
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Условия обслуживания
-                </Link>
-              </li>
-            </ul>
-          </div>
+          {/* Links Sections */}
+          {sections.map((section) => (
+            <div key={section.title}>
+              <h3 className="font-bold text-white mb-6 uppercase tracking-wider text-xs">
+                {section.title}
+              </h3>
+              <ul className="space-y-4">
+                {section.links.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-gray-400 hover:text-[#11a36d] transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
 
-        <Separator className="my-8" />
-
-        {/* Bottom */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground">
-            © {currentYear} JobPortal. Все права защищены.
-          </p>
+        <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500">
+          <p>© {currentYear} JobPortal. Все права защищены.</p>
           <div className="flex gap-6">
-            <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-              Twitter
-            </Link>
-            <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-              LinkedIn
-            </Link>
-            <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-              Facebook
-            </Link>
+            <Link href="#" className="hover:text-white transition-colors">ВКонтакте</Link>
+            <Link href="#" className="hover:text-white transition-colors">Telegram</Link>
+            <Link href="#" className="hover:text-white transition-colors">Дзен</Link>
           </div>
         </div>
       </div>

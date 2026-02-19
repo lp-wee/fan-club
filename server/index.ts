@@ -72,8 +72,16 @@ app.get('/api/vacancies', async (req: Request, res: Response) => {
     }
 
     if (employmentType) {
+      const typeMap: Record<string, string> = {
+        'full_time': 'full_time',
+        'part_time': 'part_time',
+        'contract': 'contract',
+        'freelance': 'freelance',
+        'internship': 'internship'
+      }
+      const mappedType = typeMap[employmentType as string] || employmentType
       query += ` AND v.employment_type = $${params.length + 1}`
-      params.push(employmentType)
+      params.push(mappedType)
     }
 
     if (experienceLevel) {
