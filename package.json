@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"next dev --turbo\" \"tsx watch server/index.ts\"",
+    "dev": "concurrently \"next dev --turbo -p 5000 -H 0.0.0.0\" \"tsx watch server/index.ts\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -39,6 +39,8 @@
     "@radix-ui/react-toggle": "1.1.1",
     "@radix-ui/react-toggle-group": "1.1.1",
     "@radix-ui/react-tooltip": "1.1.6",
+    "@types/cors": "^2.8.19",
+    "@types/pg": "^8.16.0",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
