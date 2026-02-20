@@ -27,8 +27,8 @@ export function Header() {
 
   const navLinks = [
     { label: 'Найти работу', href: ROUTES.VACANCIES },
-    { label: 'Компании', href: ROUTES.VACANCIES }, // Pointing to vacancies for now as companies list is not ready
-    { label: 'Услуги', href: '#' },
+    { label: 'Компании', href: '/companies' },
+    { label: 'Услуги', href: '/services' },
   ]
 
   return (

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Header } from '@/components/layout/Header'
@@ -17,22 +17,26 @@ import { MapPin, Search, Filter, Loader2, Briefcase, ChevronRight } from 'lucide
 export default function SearchPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const initialSearch = searchParams.get('search') || ''
   
   const [vacancies, setVacancies] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState(initialSearch)
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '')
+  
+  const [selectedEmploymentTypes, setSelectedEmploymentTypes] = useState<string[]>(
+    searchParams.get('employmentType')?.split(',').filter(Boolean) || []
+  )
+  const [selectedExperienceLevels, setSelectedExperienceLevels] = useState<string[]>(
+    searchParams.get('experienceLevel')?.split(',').filter(Boolean) || []
+  )
 
-  useEffect(() => {
-    loadVacancies()
-  }, [searchParams])
-
-  const loadVacancies = async () => {
+  const loadVacancies = useCallback(async () => {
     setLoading(true)
     try {
       const data = await fetchVacancies({
         search: searchParams.get('search') || undefined,
         location: searchParams.get('location') || undefined,
+        employmentType: searchParams.get('employmentType') || undefined,
+        experienceLevel: searchParams.get('experienceLevel') || undefined,
       })
       setVacancies(data)
     } catch (e) {
@@ -40,6 +44,32 @@ export default function SearchPage() {
     } finally {
       setLoading(false)
     }
+  }, [searchParams])
+
+  useEffect(() => {
+    loadVacancies()
+  }, [loadVacancies])
+
+  const updateFilters = (type: 'employmentType' | 'experienceLevel', value: string, checked: boolean) => {
+    const current = type === 'employmentType' ? selectedEmploymentTypes : selectedExperienceLevels
+    const setter = type === 'employmentType' ? setSelectedEmploymentTypes : setSelectedExperienceLevels
+    
+    let next: string[]
+    if (checked) {
+      next = [...current, value]
+    } else {
+      next = current.filter(v => v !== value)
+    }
+    
+    setter(next)
+    
+    const params = new URLSearchParams(searchParams.toString())
+    if (next.length > 0) {
+      params.set(type, next.join(','))
+    } else {
+      params.delete(type)
+    }
+    router.push(`${ROUTES.VACANCIES}?${params.toString()}`)
   }
 
   const handleSearch = (e: React.FormEvent) => {
@@ -73,7 +103,12 @@ export default function SearchPage() {
                       { id: 'freelance', label: 'Фриланс' },
                     ].map((type) => (
                       <div key={type.id} className="flex items-center space-x-2 group cursor-pointer">
-                        <Checkbox id={type.id} className="rounded-md border-gray-200 data-[state=checked]:bg-primary data-[state=checked]:border-primary" />
+                        <Checkbox 
+                          id={type.id} 
+                          checked={selectedEmploymentTypes.includes(type.id)}
+                          onCheckedChange={(checked) => updateFilters('employmentType', type.id, !!checked)}
+                          className="rounded-md border-gray-200 data-[state=checked]:bg-primary data-[state=checked]:border-primary" 
+                        />
                         <Label htmlFor={type.id} className="text-sm font-bold text-gray-600 group-hover:text-primary cursor-pointer transition-colors">
                           {type.label}
                         </Label>
@@ -91,7 +126,12 @@ export default function SearchPage() {
                       { id: 'senior', label: '3–6 лет' },
                     ].map((level) => (
                       <div key={level.id} className="flex items-center space-x-2 group cursor-pointer">
-                        <Checkbox id={level.id} className="rounded-md border-gray-200 data-[state=checked]:bg-primary data-[state=checked]:border-primary" />
+                        <Checkbox 
+                          id={level.id} 
+                          checked={selectedExperienceLevels.includes(level.id)}
+                          onCheckedChange={(checked) => updateFilters('experienceLevel', level.id, !!checked)}
+                          className="rounded-md border-gray-200 data-[state=checked]:bg-primary data-[state=checked]:border-primary" 
+                        />
                         <Label htmlFor={level.id} className="text-sm font-bold text-gray-600 group-hover:text-primary cursor-pointer transition-colors">
                           {level.label}
                         </Label>
@@ -190,6 +230,8 @@ export default function SearchPage() {
                   className="mt-8 rounded-xl border-2 font-bold hover:bg-primary hover:text-white transition-all"
                   onClick={() => {
                     setSearchQuery('')
+                    setSelectedEmploymentTypes([])
+                    setSelectedExperienceLevels([])
                     router.push(ROUTES.VACANCIES)
                   }}
                 >
