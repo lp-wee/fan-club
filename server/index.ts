@@ -925,6 +925,105 @@ app.delete('/api/resumes/:id', authenticateToken, authorizeRoles('job_seeker'), 
   }
 })
 
+// ==================== EMPLOYER VACANCIES ====================
+
+// Get employer's own vacancies
+app.get('/api/employer/vacancies', authenticateToken, authorizeRoles('employer'), async (req: AuthRequest, res: Response) => {
+  try {
+    const result = await pool.query(
+      `SELECT v.* FROM vacancies v
+       JOIN companies c ON v.company_id = c.id
+       WHERE c.user_id = $1
+       ORDER BY v.created_at DESC`,
+      [req.user?.id]
+    )
+    res.json(result.rows)
+  } catch (error: any) {
+    console.error('Error fetching employer vacancies:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// ==================== ALL COMPANIES ====================
+
+app.get('/api/companies', async (req: Request, res: Response) => {
+  try {
+    const result = await pool.query(
+      `SELECT c.*, (SELECT COUNT(*) FROM vacancies WHERE company_id = c.id AND is_active = true) as active_vacancies
+       FROM companies c ORDER BY c.created_at DESC`
+    )
+    res.json(result.rows)
+  } catch (error: any) {
+    console.error('Error fetching companies:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// ==================== MESSAGES ROUTES ====================
+
+// Get messages for current user (both sent and received)
+app.get('/api/messages', authenticateToken, async (req: AuthRequest, res: Response) => {
+  try {
+    const result = await pool.query(
+      `SELECT m.*, 
+              sender.first_name as sender_first_name, sender.last_name as sender_last_name,
+              recipient.first_name as recipient_first_name, recipient.last_name as recipient_last_name
+       FROM messages m
+       JOIN users sender ON m.sender_id = sender.id
+       JOIN users recipient ON m.recipient_id = recipient.id
+       WHERE m.sender_id = $1 OR m.recipient_id = $1
+       ORDER BY m.created_at DESC`,
+      [req.user?.id]
+    )
+    res.json(result.rows)
+  } catch (error: any) {
+    console.error('Error fetching messages:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// Send a message
+app.post('/api/messages', authenticateToken, async (req: AuthRequest, res: Response) => {
+  try {
+    const { recipient_id, title, content } = req.body
+
+    if (!recipient_id || !content) {
+      return res.status(400).json({ error: 'recipient_id and content are required' })
+    }
+
+    const result = await pool.query(
+      `INSERT INTO messages (sender_id, recipient_id, title, content)
+       VALUES ($1, $2, $3, $4)
+       RETURNING *`,
+      [req.user?.id, recipient_id, title, content]
+    )
+    res.status(201).json(result.rows[0])
+  } catch (error: any) {
+    console.error('Error sending message:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// Mark message as read
+app.put('/api/messages/:id/read', authenticateToken, async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params
+    const result = await pool.query(
+      `UPDATE messages SET is_read = true
+       WHERE id = $1 AND recipient_id = $2
+       RETURNING *`,
+      [id, req.user?.id]
+    )
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Message not found' })
+    }
+    res.json(result.rows[0])
+  } catch (error: any) {
+    console.error('Error marking message read:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
 // ==================== HEALTH CHECK ====================
 
 app.get('/api/health', async (req: Request, res: Response) => {

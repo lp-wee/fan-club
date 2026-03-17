@@ -1,35 +1,34 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
-import { User, AuthToken, UserRole } from '@/lib/types'
+import { User, UserRole } from '@/lib/types'
 import { loginUser, registerUser, logoutUser } from '@/lib/api-client'
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null)
-  const [token, setToken] = useState<AuthToken | null>(null)
+  const [token, setToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isInitialized, setIsInitialized] = useState(false)
 
-  // Restore auth from localStorage and check token expiry on mount
   useEffect(() => {
     const restoreAuth = () => {
       try {
         const savedAuth = localStorage.getItem('auth')
         if (savedAuth) {
           const auth = JSON.parse(savedAuth)
-          const { user: savedUser, access_token, refresh_token, expires_at } = auth
+          const { user: savedUser, access_token, expires_at } = auth
 
-          // Check if token is expired
           if (expires_at && expires_at < Date.now()) {
-            // Token expired, clear auth
             localStorage.removeItem('auth')
             setIsInitialized(true)
             return
           }
 
-          setUser(savedUser)
-          setToken({ access_token, refresh_token, expires_in: 0 })
+          if (savedUser && access_token) {
+            setUser(savedUser)
+            setToken(access_token)
+          }
         }
       } catch (err) {
         console.error('[Auth] Failed to restore auth:', err)
@@ -42,87 +41,73 @@ export function useAuth() {
     restoreAuth()
   }, [])
 
-  const login = useCallback(
-    async (email: string, password: string, role: UserRole) => {
-      setIsLoading(true)
-      setError(null)
-      try {
-        const response = await loginUser({ email, password, role })
-        const { user: apiUser, token: apiToken } = response
+  const login = useCallback(async (email: string, password: string, role: UserRole) => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const response = await loginUser({ email, password, role })
+      const { user: apiUser, token: apiToken } = response
 
-        // Store auth in localStorage
-        localStorage.setItem(
-          'auth',
-          JSON.stringify({
-            user: apiUser,
-            access_token: apiToken.access_token,
-            refresh_token: apiToken.refresh_token,
-            expires_at: Date.now() + apiToken.expires_in * 1000,
-          })
-        )
+      localStorage.setItem('auth', JSON.stringify({
+        user: apiUser,
+        access_token: apiToken,
+        expires_at: Date.now() + 24 * 60 * 60 * 1000,
+      }))
 
-        setUser(apiUser)
-        setToken(apiToken)
+      setUser(apiUser)
+      setToken(apiToken)
 
-        return { user: apiUser, token: apiToken }
-      } catch (err) {
-        const message = err instanceof Error ? err.message : 'Login failed'
-        setError(message)
-        throw err
-      } finally {
-        setIsLoading(false)
-      }
-    },
-    []
-  )
+      return { user: apiUser, token: apiToken }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Ошибка входа'
+      setError(message)
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
 
-  const register = useCallback(
-    async (
-      email: string,
-      password: string,
-      first_name: string,
-      last_name: string,
-      role: UserRole,
-      phone?: string
-    ) => {
-      setIsLoading(true)
-      setError(null)
-      try {
-        const response = await registerUser({
-          email,
-          password,
-          first_name,
-          last_name,
-          role,
-          phone,
-        })
-        const { user: apiUser, token: apiToken } = response
+  const register = useCallback(async (
+    email: string,
+    password: string,
+    first_name: string,
+    last_name: string,
+    role: UserRole,
+    phone?: string,
+    company_name?: string
+  ) => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const response = await registerUser({
+        email,
+        password,
+        first_name,
+        last_name,
+        role,
+        phone,
+        company_name,
+      })
+      const { user: apiUser, token: apiToken } = response
 
-        // Store auth in localStorage
-        localStorage.setItem(
-          'auth',
-          JSON.stringify({
-            user: apiUser,
-            access_token: apiToken.access_token,
-            refresh_token: apiToken.refresh_token,
-            expires_at: Date.now() + apiToken.expires_in * 1000,
-          })
-        )
+      localStorage.setItem('auth', JSON.stringify({
+        user: apiUser,
+        access_token: apiToken,
+        expires_at: Date.now() + 24 * 60 * 60 * 1000,
+      }))
 
-        setUser(apiUser)
-        setToken(apiToken)
+      setUser(apiUser)
+      setToken(apiToken)
 
-        return { user: apiUser, token: apiToken }
-      } catch (err) {
-        const message = err instanceof Error ? err.message : 'Registration failed'
-        setError(message)
-        throw err
-      } finally {
-        setIsLoading(false)
-      }
-    },
-    []
-  )
+      return { user: apiUser, token: apiToken }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Ошибка регистрации'
+      setError(message)
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
 
   const logout = useCallback(async () => {
     try {

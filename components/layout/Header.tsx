@@ -25,6 +25,21 @@ export function Header() {
     router.push(ROUTES.HOME)
   }
 
+  const displayName = (() => {
+    if (!user) return ''
+    if (user.role === 'employer') {
+      return user.first_name || user.email.split('@')[0]
+    }
+    if (user.first_name) {
+      return user.last_name ? `${user.first_name} ${user.last_name}` : user.first_name
+    }
+    return user.email.split('@')[0]
+  })()
+
+  const avatarLetter = displayName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'
+
+  const cabinetRoute = user?.role === 'employer' ? ROUTES.EMPLOYER_DASHBOARD : ROUTES.CABINET_DASHBOARD
+
   const navLinks = [
     { label: 'Найти работу', href: ROUTES.VACANCIES },
     { label: 'Компании', href: '/companies' },
@@ -84,14 +99,14 @@ export function Header() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="gap-2 hover:bg-gray-50 rounded-xl px-2">
                       <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-xs font-black text-primary">
-                        {user?.email?.[0].toUpperCase()}
+                        {avatarLetter}
                       </div>
-                      <span className="hidden sm:inline text-sm font-bold text-gray-700">{user?.email?.split('@')[0]}</span>
+                      <span className="hidden sm:inline text-sm font-bold text-gray-700 max-w-[140px] truncate">{displayName}</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56 rounded-2xl border-gray-100 p-2 shadow-xl">
                     <DropdownMenuItem asChild className="rounded-xl font-bold">
-                      <Link href={ROUTES.CABINET_DASHBOARD}>Личный кабинет</Link>
+                      <Link href={cabinetRoute}>Личный кабинет</Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-gray-50" />
                     <DropdownMenuItem onClick={handleLogout} className="text-red-600 rounded-xl font-bold">
@@ -130,6 +145,14 @@ export function Header() {
               <div className="flex flex-col gap-3">
                 <Button onClick={() => router.push(ROUTES.LOGIN)} variant="outline" className="h-12 rounded-xl font-bold">Вход</Button>
                 <Button onClick={() => router.push(ROUTES.REGISTER)} className="h-12 rounded-xl font-black">Регистрация</Button>
+              </div>
+            )}
+            {isAuthenticated && (
+              <div className="flex flex-col gap-3">
+                <Link href={cabinetRoute}>
+                  <Button variant="outline" className="w-full h-12 rounded-xl font-bold">Личный кабинет</Button>
+                </Link>
+                <Button onClick={handleLogout} variant="ghost" className="h-12 rounded-xl font-bold text-red-600">Выйти</Button>
               </div>
             )}
           </nav>

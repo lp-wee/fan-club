@@ -28,11 +28,12 @@ export default function VacancyDetailPage({ params }: { params: Promise<{ id: st
   const router = useRouter()
   const resolvedParams = use(params)
   const id = resolvedParams.id
-  const { user, isAuthenticated, userRole } = useAuth()
+  const { isAuthenticated, isInitialized, userRole } = useAuth()
   const [vacancy, setVacancy] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [applying, setApplying] = useState(false)
   const [applied, setApplied] = useState(false)
+  const [applyError, setApplyError] = useState('')
 
   useEffect(() => {
     if (!id || id === 'undefined') return
@@ -55,21 +56,20 @@ export default function VacancyDetailPage({ params }: { params: Promise<{ id: st
       return
     }
     if (userRole !== 'job_seeker') {
-      alert('Только соискатели могут откликаться на вакансии')
+      setApplyError('Только соискатели могут откликаться на вакансии')
       return
     }
 
     setApplying(true)
+    setApplyError('')
     try {
-      // Assuming user has a default job_seeker_id and resume_id for demo
       await createApplication({
         vacancy_id: parseInt(id),
-        job_seeker_id: 1, // Mock ID
-        cover_letter: 'Интересует данная вакансия'
+        cover_letter: 'Интересует данная вакансия',
       })
       setApplied(true)
-    } catch (e) {
-      alert('Вы уже откликнулись на эту вакансию или произошла ошибка')
+    } catch (e: any) {
+      setApplyError(e.message || 'Вы уже откликнулись на эту вакансию или произошла ошибка')
     } finally {
       setApplying(false)
     }
@@ -142,19 +142,27 @@ export default function VacancyDetailPage({ params }: { params: Promise<{ id: st
                   <div className="space-y-1">
                     <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Зарплата</span>
                     <p className="text-2xl font-extrabold text-gray-900">
-                      {vacancy.salary_min || vacancy.salary_max ? 
-                        `${vacancy.salary_min || 0} – ${vacancy.salary_max || '∞'} ₽` : 
+                      {vacancy.salary_min || vacancy.salary_max ?
+                        `${vacancy.salary_min || 0} – ${vacancy.salary_max || '∞'} ₽` :
                         'Зарплата не указана'}
                     </p>
                   </div>
                   <div className="space-y-1">
                     <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Опыт работы</span>
                     <p className="text-lg font-bold text-gray-900">
-                      {vacancy.experience_level === 'entry' ? 'Без опыта' : 
-                       vacancy.experience_level === 'mid' ? '1–3 года' : 
+                      {vacancy.experience_level === 'entry' ? 'Без опыта' :
+                       vacancy.experience_level === 'mid' ? '1–3 года' :
                        vacancy.experience_level === 'senior' ? '3–6 лет' : 'Более 6 лет'}
                     </p>
                   </div>
+                  {vacancy.location && (
+                    <div className="space-y-1">
+                      <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Город</span>
+                      <p className="text-lg font-bold text-gray-900 flex items-center gap-1">
+                        <MapPin className="w-4 h-4" />{vacancy.location}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-6">
@@ -174,15 +182,15 @@ export default function VacancyDetailPage({ params }: { params: Promise<{ id: st
                 </h2>
                 <div className="flex flex-col md:flex-row gap-8">
                   <div className="flex-1 space-y-4">
-                    <p className="text-gray-700 leading-relaxed">{vacancy.company_description}</p>
+                    <p className="text-gray-700 leading-relaxed">{vacancy.company_description || 'Описание компании не указано'}</p>
                     <div className="grid grid-cols-2 gap-4 pt-4">
                       <div className="bg-gray-50 p-4 rounded-xl">
                         <span className="text-xs font-bold text-gray-400 uppercase block mb-1">Город</span>
-                        <span className="font-bold text-gray-900">{vacancy.company_location || vacancy.location}</span>
+                        <span className="font-bold text-gray-900">{vacancy.company_location || vacancy.location || '—'}</span>
                       </div>
                       <div className="bg-gray-50 p-4 rounded-xl">
                         <span className="text-xs font-bold text-gray-400 uppercase block mb-1">Сотрудники</span>
-                        <span className="font-bold text-gray-900">{vacancy.employee_count || '10-50'} чел.</span>
+                        <span className="font-bold text-gray-900">{vacancy.employee_count ? `${vacancy.employee_count} чел.` : '—'}</span>
                       </div>
                     </div>
                   </div>
@@ -196,7 +204,7 @@ export default function VacancyDetailPage({ params }: { params: Promise<{ id: st
                   <div className="bg-green-50 p-6 rounded-xl border border-green-100 text-center">
                     <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
                     <h3 className="text-xl font-bold text-green-800 mb-2">Отклик отправлен!</h3>
-                    <p className="text-green-700 text-sm mb-6">Работодатель увидит ваше резюме и свяжется с вами.</p>
+                    <p className="text-green-700 text-sm mb-6">Работодатель увидит ваш профиль и свяжется с вами.</p>
                     <Button variant="outline" className="w-full border-green-200 text-green-700 hover:bg-green-100" onClick={() => router.push(ROUTES.VACANCIES)}>
                       К поиску вакансий
                     </Button>
@@ -205,10 +213,10 @@ export default function VacancyDetailPage({ params }: { params: Promise<{ id: st
                   <div className="space-y-6">
                     <div className="space-y-2">
                       <h3 className="text-xl font-extrabold text-gray-900">Готовы откликнуться?</h3>
-                      <p className="text-sm text-gray-500 font-medium">Ваше резюме будет доступно работодателю сразу после отправки.</p>
+                      <p className="text-sm text-gray-500 font-medium">Ваш профиль будет доступен работодателю сразу после отправки.</p>
                     </div>
 
-                    {!isAuthenticated ? (
+                    {!isInitialized ? null : !isAuthenticated ? (
                       <div className="space-y-3">
                         <Button onClick={() => router.push(ROUTES.LOGIN)} className="w-full h-12 bg-primary text-white font-bold text-lg">Войти и откликнуться</Button>
                         <p className="text-center text-xs text-gray-400">Нет аккаунта? <Link href={ROUTES.REGISTER} className="text-primary hover:underline">Зарегистрируйтесь</Link></p>
@@ -219,13 +227,18 @@ export default function VacancyDetailPage({ params }: { params: Promise<{ id: st
                         <p className="text-sm text-amber-800 font-medium">Отклики доступны только для соискателей.</p>
                       </div>
                     ) : (
-                      <Button 
-                        onClick={handleApply} 
-                        disabled={applying}
-                        className="w-full h-14 bg-accent hover:bg-accent/90 text-white font-black text-xl shadow-lg shadow-accent/20 rounded-xl"
-                      >
-                        {applying ? <Loader2 className="w-6 h-6 animate-spin" /> : 'ОТКЛИКНУТЬСЯ'}
-                      </Button>
+                      <>
+                        {applyError && (
+                          <div className="bg-red-50 p-3 rounded-xl border border-red-100 text-sm text-red-700">{applyError}</div>
+                        )}
+                        <Button
+                          onClick={handleApply}
+                          disabled={applying}
+                          className="w-full h-14 bg-accent hover:bg-accent/90 text-white font-black text-xl shadow-lg shadow-accent/20 rounded-xl"
+                        >
+                          {applying ? <Loader2 className="w-6 h-6 animate-spin" /> : 'ОТКЛИКНУТЬСЯ'}
+                        </Button>
+                      </>
                     )}
 
                     <div className="pt-6 border-t border-gray-100 space-y-4">

@@ -24,7 +24,7 @@ export default function RegisterPage() {
     last_name: '',
     company_name: '',
     phone: '',
-    role: 'job_seeker' as const,
+    role: 'job_seeker' as 'job_seeker' | 'employer',
   })
   const [passwordError, setPasswordError] = useState('')
 
@@ -48,24 +48,38 @@ export default function RegisterPage() {
     }
 
     try {
-      // For job seekers, use first_name and last_name
-      // For employers, use company_name as both first_name and last_name
-      const first_name = formData.role === 'job_seeker' ? formData.first_name : formData.company_name
-      const last_name = formData.role === 'job_seeker' ? formData.last_name : ''
-
-      await register(
-        formData.email,
-        formData.password,
-        first_name,
-        last_name,
-        formData.role,
-        formData.phone || undefined
-      )
+      if (formData.role === 'employer') {
+        if (!formData.company_name.trim()) {
+          setPasswordError('Укажите название компании')
+          return
+        }
+        await register(
+          formData.email,
+          formData.password,
+          formData.company_name,
+          '',
+          'employer',
+          formData.phone || undefined,
+          formData.company_name
+        )
+      } else {
+        if (!formData.first_name.trim()) {
+          setPasswordError('Укажите ваше имя')
+          return
+        }
+        await register(
+          formData.email,
+          formData.password,
+          formData.first_name,
+          formData.last_name,
+          'job_seeker',
+          formData.phone || undefined
+        )
+      }
       const redirectUrl = formData.role === 'job_seeker' ? ROUTES.CABINET_DASHBOARD : ROUTES.EMPLOYER_DASHBOARD
       router.push(redirectUrl)
     } catch (err) {
       console.error('[Register] Error:', err)
-      // Error is handled by useAuth hook and displayed in UI
     }
   }
 
@@ -73,7 +87,6 @@ export default function RegisterPage() {
     <div className="min-h-screen flex flex-col bg-[#f4f7f9]">
       <Header />
       <main className="flex-1 flex items-center justify-center py-12 px-4 relative overflow-hidden">
-        {/* hh.ru style illustrations/blobs */}
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-400 rounded-full mix-blend-multiply filter blur-[130px] opacity-10 -translate-y-1/2 translate-x-1/3"></div>
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-red-400 rounded-full mix-blend-multiply filter blur-[110px] opacity-10 translate-y-1/3 -translate-x-1/4"></div>
 
@@ -128,44 +141,37 @@ export default function RegisterPage() {
                     <div className="space-y-4">
                       {formData.role === 'job_seeker' ? (
                         <>
-                          <div className="space-y-2">
-                            <Input
-                              id="first_name"
-                              name="first_name"
-                              placeholder="Ваше имя"
-                              className="h-14 border-gray-200 rounded-xl px-5 font-medium"
-                              value={formData.first_name}
-                              onChange={handleChange}
-                              required
-                              disabled={isLoading}
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Input
-                              id="last_name"
-                              name="last_name"
-                              placeholder="Ваша фамилия"
-                              className="h-14 border-gray-200 rounded-xl px-5 font-medium"
-                              value={formData.last_name}
-                              onChange={handleChange}
-                              required
-                              disabled={isLoading}
-                            />
-                          </div>
-                        </>
-                      ) : (
-                        <div className="space-y-2">
                           <Input
-                            id="company_name"
-                            name="company_name"
-                            placeholder="Название вашей компании"
+                            id="first_name"
+                            name="first_name"
+                            placeholder="Ваше имя"
                             className="h-14 border-gray-200 rounded-xl px-5 font-medium"
-                            value={formData.company_name}
+                            value={formData.first_name}
                             onChange={handleChange}
                             required
                             disabled={isLoading}
                           />
-                        </div>
+                          <Input
+                            id="last_name"
+                            name="last_name"
+                            placeholder="Ваша фамилия"
+                            className="h-14 border-gray-200 rounded-xl px-5 font-medium"
+                            value={formData.last_name}
+                            onChange={handleChange}
+                            disabled={isLoading}
+                          />
+                        </>
+                      ) : (
+                        <Input
+                          id="company_name"
+                          name="company_name"
+                          placeholder="Название вашей компании"
+                          className="h-14 border-gray-200 rounded-xl px-5 font-medium"
+                          value={formData.company_name}
+                          onChange={handleChange}
+                          required
+                          disabled={isLoading}
+                        />
                       )}
                     </div>
                   </div>

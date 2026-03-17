@@ -5,7 +5,6 @@ interface FetchOptions extends RequestInit {
   skipAuth?: boolean
 }
 
-// Get auth token from localStorage
 function getAuthToken(): string | null {
   if (typeof window === 'undefined') return null
   const auth = localStorage.getItem('auth')
@@ -15,49 +14,6 @@ function getAuthToken(): string | null {
     return access_token || null
   } catch {
     return null
-  }
-}
-
-// Refresh token if needed
-async function refreshAuthToken(): Promise<boolean> {
-  try {
-    const auth = localStorage.getItem('auth')
-    if (!auth) return false
-    
-    const { refresh_token } = JSON.parse(auth)
-    if (!refresh_token) return false
-
-    const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refresh_token }),
-    })
-
-    if (!response.ok) {
-      // Clear invalid auth
-      localStorage.removeItem('auth')
-      return false
-    }
-
-    const data = await response.json()
-    const { access_token, expires_in } = data
-
-    // Update stored token
-    const currentAuth = JSON.parse(auth)
-    localStorage.setItem(
-      'auth',
-      JSON.stringify({
-        ...currentAuth,
-        access_token,
-        expires_at: Date.now() + expires_in * 1000,
-      })
-    )
-
-    return true
-  } catch (error) {
-    console.error('[API] Token refresh failed:', error)
-    localStorage.removeItem('auth')
-    return false
   }
 }
 
@@ -75,7 +31,6 @@ async function apiFetch<T = any>(
       ...fetchOptions.headers,
     } as Record<string, string>
 
-    // Add auth token if not skipped
     if (!skipAuth) {
       const token = getAuthToken()
       if (token) {
@@ -83,31 +38,15 @@ async function apiFetch<T = any>(
       }
     }
 
-    let response = await fetch(url, {
+    const response = await fetch(url, {
       headers,
       ...fetchOptions,
     })
 
-    // If 401, try to refresh token once and retry
-    if (response.status === 401 && !skipAuth) {
-      const refreshed = await refreshAuthToken()
-      if (refreshed) {
-        const newToken = getAuthToken()
-        if (newToken) {
-          headers['Authorization'] = `Bearer ${newToken}`
-          response = await fetch(url, {
-            headers,
-            ...fetchOptions,
-          })
-        }
-      }
-    }
-
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: response.statusText }))
-      
-      // If still 401 after refresh, clear auth and let app handle redirect
-      if (response.status === 401) {
+
+      if (response.status === 401 && !skipAuth) {
         localStorage.removeItem('auth')
         if (typeof window !== 'undefined') {
           window.location.href = '/login'
@@ -138,6 +77,7 @@ export async function registerUser(data: {
   last_name: string
   role: 'job_seeker' | 'employer' | 'admin'
   phone?: string
+  company_name?: string
 }) {
   return apiFetch('/auth/register', {
     method: 'POST',
@@ -168,10 +108,6 @@ export async function logoutUser() {
   }
 }
 
-export async function getCurrentUser() {
-  return apiFetch('/users/me')
-}
-
 // ==================== VACANCIES ====================
 
 export async function fetchVacancies(filters?: {
@@ -198,8 +134,11 @@ export async function fetchVacancy(id: string) {
   return apiFetch(`/vacancies/${id}`)
 }
 
+export async function fetchEmployerVacancies() {
+  return apiFetch('/employer/vacancies')
+}
+
 export async function createVacancy(data: {
-  company_id: number
   title: string
   description: string
   salary_min?: number
@@ -237,22 +176,17 @@ export async function updateVacancy(
 // ==================== APPLICATIONS ====================
 
 export async function fetchApplications(filters?: {
-  job_seeker_id?: number
   vacancy_id?: number
 }) {
   const params = new URLSearchParams()
-
-  if (filters?.job_seeker_id) params.append('job_seeker_id', filters.job_seeker_id.toString())
   if (filters?.vacancy_id) params.append('vacancy_id', filters.vacancy_id.toString())
-
   return apiFetch(`/applications?${params.toString()}`)
 }
 
 export async function createApplication(data: {
   vacancy_id: number
-  job_seeker_id: number
-  resume_id?: number
   cover_letter?: string
+  resume_id?: number
 }) {
   return apiFetch('/applications', {
     method: 'POST',
@@ -269,13 +203,55 @@ export async function updateApplicationStatus(id: number, status: string) {
 
 // ==================== SAVED JOBS ====================
 
-export async function fetchSavedJobs(jobSeekerId: number) {
-  return apiFetch(`/saved-jobs/${jobSeekerId}`)
+export async function fetchSavedJobs() {
+  return apiFetch('/saved-jobs')
 }
 
-export async function toggleSaveJob(jobSeekerId: number, vacancyId: number) {
-  return apiFetch(`/saved-jobs/${jobSeekerId}/${vacancyId}`, {
+export async function toggleSaveJob(vacancyId: number) {
+  return apiFetch(`/saved-jobs/${vacancyId}`, {
     method: 'POST',
+  })
+}
+
+// ==================== RESUMES ====================
+
+export async function fetchResumes() {
+  return apiFetch('/resumes')
+}
+
+export async function createResume(data: { title: string; file_url?: string }) {
+  return apiFetch('/resumes', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+export async function deleteResume(id: number) {
+  return apiFetch(`/resumes/${id}`, {
+    method: 'DELETE',
+  })
+}
+
+// ==================== MESSAGES ====================
+
+export async function fetchMessages() {
+  return apiFetch('/messages')
+}
+
+export async function sendMessage(data: {
+  recipient_id: number
+  title: string
+  content: string
+}) {
+  return apiFetch('/messages', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+export async function markMessageRead(id: number) {
+  return apiFetch(`/messages/${id}/read`, {
+    method: 'PUT',
   })
 }
 
@@ -283,6 +259,10 @@ export async function toggleSaveJob(jobSeekerId: number, vacancyId: number) {
 
 export async function fetchCompany(id: number) {
   return apiFetch(`/companies/${id}`)
+}
+
+export async function fetchAllCompanies() {
+  return apiFetch('/companies')
 }
 
 // ==================== HEALTH CHECK ====================
