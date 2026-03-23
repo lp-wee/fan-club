@@ -35,6 +35,29 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next()
 })
 
+// ==================== HELPER FUNCTIONS ====================
+
+// Helper to get expires_in from JWT token
+const getExpiresInFromToken = (token: string): number => {
+  try {
+    const decoded = jwt.decode(token) as any
+    if (decoded && decoded.exp) {
+      const now = Math.floor(Date.now() / 1000)
+      return decoded.exp - now
+    }
+    return 86400 // 24 hours default
+  } catch (error) {
+    console.error('Failed to decode token:', error)
+    return 86400
+  }
+}
+
+// Helper to format user response
+const formatUserResponse = (user: any) => {
+  const { password_hash, ...userWithoutPassword } = user
+  return userWithoutPassword
+}
+
 // ==================== AUTH MIDDLEWARE ====================
 
 interface AuthRequest extends Request {
@@ -42,6 +65,8 @@ interface AuthRequest extends Request {
     id: number;
     email: string;
     role: string;
+    first_name: string;
+    last_name: string;
   }
 }
 
@@ -130,7 +155,7 @@ app.post('/api/auth/register', async (req: Request, res: Response) => {
     const userResult = await client.query(
       `INSERT INTO users (email, password_hash, first_name, last_name, phone, role)
        VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING id, email, first_name, last_name, role, created_at`,
+       RETURNING id, email, first_name, last_name, phone, role, created_at, updated_at`,
       [email, hashedPassword, first_name, last_name, phone, role || 'job_seeker']
     )
 
@@ -143,18 +168,24 @@ app.post('/api/auth/register', async (req: Request, res: Response) => {
         throw new Error('Company name is required for employer registration')
       }
 
-      await client.query(
+      const companyResult = await client.query(
         `INSERT INTO companies (user_id, name, description, website, location, industry)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
+         VALUES ($1, $2, $3, $4, $5, $6)
+         RETURNING id, name, description, website, location, industry, logo, employee_count, rating`,
         [user.id, company_name, company_description, company_website, company_location, company_industry]
       )
+      
+      user.profile = companyResult.rows[0]
     } else {
       // Default to job_seeker
-      await client.query(
+      const jobSeekerResult = await client.query(
         `INSERT INTO job_seekers (user_id, title, bio, location, experience_years, skills)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
+         VALUES ($1, $2, $3, $4, $5, $6)
+         RETURNING id, title, bio, location, experience_years, skills`,
         [user.id, title, bio, location, experience_years || 0, skills || []]
       )
+      
+      user.profile = jobSeekerResult.rows[0]
     }
 
     await client.query('COMMIT')
@@ -172,16 +203,20 @@ app.post('/api/auth/register', async (req: Request, res: Response) => {
       { expiresIn: '24h' }
     )
 
+    // Calculate expires_in from token
+    const expires_in = getExpiresInFromToken(token)
+
+    // Remove sensitive data
+    const userResponse = formatUserResponse(user)
+
     res.status(201).json({
       message: 'User registered successfully',
-      user: {
-        id: user.id,
-        email: user.email,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        role: user.role
-      },
-      token
+      user: userResponse,
+      token: {
+        access_token: token,
+        refresh_token: token, // In production, you might want to generate a separate refresh token
+        expires_in: expires_in
+      }
     })
 
   } catch (error: any) {
@@ -209,13 +244,18 @@ app.post('/api/auth/login', async (req: Request, res: Response) => {
                 WHEN u.role = 'employer' THEN json_build_object(
                   'id', c.id,
                   'name', c.name,
+                  'description', c.description,
                   'logo', c.logo,
+                  'website', c.website,
                   'location', c.location,
-                  'industry', c.industry
+                  'industry', c.industry,
+                  'employee_count', c.employee_count,
+                  'rating', c.rating
                 )
                 WHEN u.role = 'job_seeker' THEN json_build_object(
                   'id', js.id,
                   'title', js.title,
+                  'bio', js.bio,
                   'skills', js.skills,
                   'location', js.location,
                   'experience_years', js.experience_years
@@ -254,13 +294,20 @@ app.post('/api/auth/login', async (req: Request, res: Response) => {
       { expiresIn: '24h' }
     )
 
+    // Calculate expires_in from token
+    const expires_in = getExpiresInFromToken(token)
+
     // Remove sensitive data
-    delete user.password_hash
+    const userResponse = formatUserResponse(user)
 
     res.json({
       message: 'Login successful',
-      user,
-      token
+      user: userResponse,
+      token: {
+        access_token: token,
+        refresh_token: token, // In production, you might want to generate a separate refresh token
+        expires_in: expires_in
+      }
     })
 
   } catch (error: any) {
@@ -273,7 +320,7 @@ app.post('/api/auth/login', async (req: Request, res: Response) => {
 app.get('/api/auth/me', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const userResult = await pool.query(
-      `SELECT u.id, u.email, u.first_name, u.last_name, u.phone, u.role, u.avatar, u.created_at,
+      `SELECT u.id, u.email, u.first_name, u.last_name, u.phone, u.role, u.avatar, u.created_at, u.updated_at,
               CASE 
                 WHEN u.role = 'employer' THEN (
                   SELECT json_build_object(
@@ -313,7 +360,8 @@ app.get('/api/auth/me', authenticateToken, async (req: AuthRequest, res: Respons
       return res.status(404).json({ error: 'User not found' })
     }
 
-    res.json(userResult.rows[0])
+    const userResponse = formatUserResponse(userResult.rows[0])
+    res.json(userResponse)
 
   } catch (error: any) {
     console.error('Error fetching user profile:', error)
@@ -329,13 +377,24 @@ app.post('/api/auth/refresh', authenticateToken, async (req: AuthRequest, res: R
       { 
         id: req.user?.id, 
         email: req.user?.email, 
-        role: req.user?.role 
+        role: req.user?.role,
+        first_name: req.user?.first_name,
+        last_name: req.user?.last_name
       },
       JWT_SECRET,
       { expiresIn: '24h' }
     )
 
-    res.json({ token })
+    // Calculate expires_in from token
+    const expires_in = getExpiresInFromToken(token)
+
+    res.json({
+      token: {
+        access_token: token,
+        refresh_token: token,
+        expires_in: expires_in
+      }
+    })
 
   } catch (error: any) {
     console.error('Error refreshing token:', error)
@@ -385,7 +444,7 @@ app.post('/api/auth/change-password', authenticateToken, async (req: AuthRequest
   }
 })
 
-// Logout (client-side only, but we'll add a blacklist in production)
+// Logout
 app.post('/api/auth/logout', authenticateToken, (req: Request, res: Response) => {
   // In production, you might want to blacklist the token
   res.json({ message: 'Logged out successfully' })
