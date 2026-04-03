@@ -1,0 +1,93 @@
+
+> my-project@0.1.0 dev
+> concurrently "next dev --turbo -p 5000 -H 0.0.0.0" "tsx watch server/index.ts"
+
+[1G[0K[0m[0][0m [1m[38;2;173;127;168m▲ Next.js 16.1.6[39m[22m (Turbopack)
+[0m[0][0m - Local:         http://localhost:5000
+[0m[0][0m - Network:       http://0.0.0.0:5000
+[0m[0][0m - Environments: .env
+[0m[0][0m - Experiments (use with caution):
+[0m[0][0m   · serverActions
+[0m[0][0m 
+[0m[0][0m [32m[1m✓[22m[39m Starting...
+[0m[0][0m [35m[1mAttention[22m[39m: Next.js now collects completely anonymous telemetry regarding usage.
+[0m[0][0m This information is used to shape Next.js' roadmap and prioritize features.
+[0m[0][0m You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+[0m[0][0m [36mhttps://nextjs.org/telemetry[39m
+[0m[0][0m 
+[0m[1][0m [dotenv@17.3.1] injecting env (3) from .env -- tip: ⚡️ secrets for agents: https://dotenvx.com/as2
+[0m[1][0m [API Server] ✓ Running on http://localhost:3001
+[0m[1][0m [API Server] ✓ Environment: development
+[0m[1][0m [API Server] ✓ Database: configured
+[0m[1][0m [API Server] ✓ Health check: http://localhost:3001/api/health
+[0m[0][0m [32m[1m✓[22m[39m Ready in 2.3s
+[0m[0][0m [37m[1m○[22m[39m Compiling / ...
+[0m[0][0m  GET / [32m200[39m in 4.4s[2m (compile: 4.1s, render: 240ms)[22m
+[0m[1][0m [2026-04-01T17:27:37.114Z] GET /api/vacancies
+[0m[1][0m Error fetching vacancies: error: relation "vacancies" does not exist
+[0m[1][0m     at [90m/home/runner/workspace/[39mnode_modules/[4mpg-pool[24m/index.js:45:11
+[0m[1][0m [90m    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
+[0m[1][0m     at async <anonymous> [90m(/home/runner/workspace/[39mserver/index.ts:530:20[90m)[39m {
+[0m[1][0m   length: [33m108[39m,
+[0m[1][0m   severity: [32m'ERROR'[39m,
+[0m[1][0m   code: [32m'42P01'[39m,
+[0m[1][0m   detail: [90mundefined[39m,
+[0m[1][0m   hint: [90mundefined[39m,
+[0m[1][0m   position: [32m'78'[39m,
+[0m[1][0m   internalPosition: [90mundefined[39m,
+[0m[1][0m   internalQuery: [90mundefined[39m,
+[0m[1][0m   where: [90mundefined[39m,
+[0m[1][0m   schema: [90mundefined[39m,
+[0m[1][0m   table: [90mundefined[39m,
+[0m[1][0m   column: [90mundefined[39m,
+[0m[1][0m   dataType: [90mundefined[39m,
+[0m[1][0m   constraint: [90mundefined[39m,
+[0m[1][0m   file: [32m'parse_relation.c'[39m,
+[0m[1][0m   line: [32m'1452'[39m,
+[0m[1][0m   routine: [32m'parserOpenTable'[39m
+[0m[1][0m }
+[0m[0][0m  GET / [32m200[39m in 44ms[2m (compile: 3ms, render: 41ms)[22m
+[0m[0][0m  GET / [32m200[39m in 37ms[2m (compile: 3ms, render: 35ms)[22m
+[0m[1][0m [2026-04-01T17:27:54.724Z] GET /api/vacancies
+[0m[1][0m [2026-04-01T17:27:57.735Z] GET /api/vacancies
+[0m[0][0m [33m[1m⚠[22m[39m Blocked cross-origin request from d0b2d072-14eb-474b-8cb5-2f4002196090-00-1gu7l8bvp623a.kirk.replit.dev to /_next/* resource. To allow this, configure "allowedDevOrigins" in next.config
+[0m[0][0m Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+[0m[0][0m  GET /vacancies [32m200[39m in 556ms[2m (compile: 465ms, render: 91ms)[22m
+[0m[1][0m [2026-04-01T17:28:09.940Z] GET /api/vacancies
+[0m[0][0m  GET / [32m200[39m in 40ms[2m (compile: 3ms, render: 37ms)[22m
+[0m[1][0m [2026-04-01T17:29:37.732Z] GET /api/vacancies
+[0m[0][0m  GET / [32m200[39m in 37ms[2m (compile: 2ms, render: 35ms)[22m
+[0m[1][0m [2026-04-01T17:30:37.460Z] GET /api/vacancies
+[0m[0][0m  GET / [32m200[39m in 40ms[2m (compile: 2ms, render: 37ms)[22m
+[0m[1][0m [2026-04-01T17:31:56.582Z] GET /api/vacancies
+[0m[0][0m  GET / [32m200[39m in 47ms[2m (compile: 3ms, render: 43ms)[22m
+[0m[1][0m [2026-04-01T17:34:09.511Z] GET /api/vacancies
+[0m[0][0m  GET / [32m200[39m in 42ms[2m (compile: 4ms, render: 38ms)[22m
+[0m[1][0m [2026-04-01T18:12:45.531Z] GET /api/vacancies
+[0m[0][0m  GET /vacancies [32m200[39m in 24ms[2m (compile: 3ms, render: 21ms)[22m
+[0m[0][0m  GET /vacancies [32m200[39m in 17ms[2m (compile: 3ms, render: 14ms)[22m
+[0m[1][0m [2026-04-01T18:12:50.742Z] GET /api/vacancies
+[0m[1][0m [2026-04-01T18:12:50.985Z] GET /api/vacancies
+[0m[0][0m  GET /companies [32m200[39m in 1516ms[2m (compile: 1493ms, render: 23ms)[22m
+[0m[0][0m  GET /companies [32m200[39m in 21ms[2m (compile: 3ms, render: 18ms)[22m
+[0m[0][0m  GET /companies [32m200[39m in 16ms[2m (compile: 3ms, render: 13ms)[22m
+[0m[0][0m  GET /companies [32m200[39m in 15ms[2m (compile: 2ms, render: 13ms)[22m
+[0m[0][0m  GET /services [32m200[39m in 606ms[2m (compile: 591ms, render: 15ms)[22m
+[0m[0][0m  GET /services [32m200[39m in 16ms[2m (compile: 3ms, render: 14ms)[22m
+[0m[0][0m  GET /login [32m200[39m in 299ms[2m (compile: 281ms, render: 18ms)[22m
+[0m[0][0m  GET /register [32m200[39m in 321ms[2m (compile: 304ms, render: 16ms)[22m
+[0m[0][0m  GET /login [32m200[39m in 15ms[2m (compile: 2ms, render: 12ms)[22m
+[0m[1][0m [2026-04-01T18:13:06.553Z] POST /api/auth/login
+[0m[1][0m [2026-04-01T18:13:07.447Z] POST /api/auth/login
+[0m[1][0m [2026-04-01T18:13:09.220Z] POST /api/auth/login
+[0m[1][0m [2026-04-01T18:13:10.528Z] POST /api/auth/login
+[0m[0][0m  GET /login [32m200[39m in 78ms[2m (compile: 3ms, render: 75ms)[22m
+[0m[1][0m [2026-04-01T18:13:27.892Z] POST /api/auth/login
+[0m[1][0m [2026-04-01T18:13:28.922Z] POST /api/auth/login
+[0m[1][0m [2026-04-01T18:13:30.463Z] POST /api/auth/login
+[0m[1][0m [2026-04-01T18:13:33.821Z] POST /api/auth/login
+[0m[1][0m [2026-04-01T18:13:34.639Z] POST /api/auth/login
+[0m[1][0m [2026-04-01T18:13:37.537Z] POST /api/auth/login
+[0m[0][0m  GET /login [32m200[39m in 45ms[2m (compile: 3ms, render: 42ms)[22m
+[0m[1][0m [0mtsx watch server/index.ts exited with code SIGHUP[0m
+[0m[0][0m [0mnext dev --turbo -p 5000 -H 0.0.0.0 exited with code SIGHUP[0m

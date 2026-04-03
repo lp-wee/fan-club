@@ -1,0 +1,6 @@
+[1G[0K⠙[1G[0K
+> my-project@0.1.0 dev
+> concurrently "next dev --turbo -p 5000 -H 0.0.0.0" "tsx watch server/index.ts"
+
+[1G[0K⠙[1G[0Ksh: 1: concurrently: not found
+[1G[0K⠙[1G[0K

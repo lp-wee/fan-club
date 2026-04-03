@@ -1,0 +1,68 @@
+
+> my-project@0.1.0 dev
+> concurrently "next dev --turbo -p 5000 -H 0.0.0.0" "tsx watch server/index.ts"
+
+[1G[0K[0m[1][0m [dotenv@17.3.1] injecting env (3) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[0m[1][0m [API Server] ✓ Running on http://localhost:3001
+[0m[1][0m [API Server] ✓ Environment: development
+[0m[1][0m [API Server] ✓ Database: configured
+[0m[1][0m [API Server] ✓ Health check: http://localhost:3001/api/health
+[0m[0][0m [31m[1m⨯[22m[39m Failed to start server
+[0m[0][0m Error: listen EADDRINUSE: address already in use 0.0.0.0:5000
+[0m[0][0m     at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:5000) {
+[0m[0][0m   code: [32m'EADDRINUSE'[39m,
+[0m[0][0m   errno: [33m-98[39m,
+[0m[0][0m   syscall: [32m'listen'[39m,
+[0m[0][0m   address: [32m'0.0.0.0'[39m,
+[0m[0][0m   port: [33m5000[39m
+[0m[0][0m }
+[0m[0][0m [?25h
+[0m[0][0m [0mnext dev --turbo -p 5000 -H 0.0.0.0 exited with code 1[0m
+[0m[1][0m [90m6:18:09 PM[39m [96m[tsx][39m [95mchange[39m in [92m./server/index.ts[39m [33mRerunning...[39m
+[0m[1][0m c[dotenv@17.3.1] injecting env (3) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[0m[1][0m [API Server] ✓ Running on http://localhost:3001
+[0m[1][0m [API Server] ✓ Environment: development
+[0m[1][0m [API Server] ✓ Database: configured
+[0m[1][0m [API Server] ✓ Health check: http://localhost:3001/api/health
+[0m[1][0m [2026-04-01T18:18:23.440Z] PUT /api/vacancies/1
+[0m[1][0m [2026-04-01T18:18:23.516Z] PUT /api/vacancies/2
+[0m[1][0m [2026-04-01T18:18:26.526Z] POST /api/saved-jobs/1
+[0m[1][0m [2026-04-01T18:18:26.582Z] GET /api/saved-jobs
+[0m[1][0m [2026-04-01T18:18:26.632Z] POST /api/saved-jobs/1
+[0m[1][0m [2026-04-01T18:18:26.684Z] POST /api/resumes
+[0m[1][0m [2026-04-01T18:18:26.736Z] GET /api/resumes
+[0m[1][0m [2026-04-01T18:18:40.027Z] POST /api/messages
+[0m[1][0m [2026-04-01T18:18:40.113Z] POST /api/messages
+[0m[1][0m [2026-04-01T18:18:40.173Z] GET /api/messages
+[0m[1][0m [2026-04-01T18:18:40.232Z] GET /api/messages/conversation/2
+[0m[1][0m [2026-04-01T18:18:40.295Z] GET /api/messages/contacts
+[0m[1][0m [2026-04-01T18:18:40.348Z] PUT /api/messages/1/read
+[0m[1][0m [2026-04-01T18:18:47.584Z] GET /api/admin/stats
+[0m[1][0m [2026-04-01T18:18:47.653Z] GET /api/admin/stats
+[0m[1][0m [2026-04-01T18:18:47.720Z] GET /api/admin/users
+[0m[1][0m [2026-04-01T18:18:47.791Z] GET /api/admin/vacancies
+[0m[1][0m [2026-04-01T18:18:47.853Z] PUT /api/admin/vacancies/1
+[0m[1][0m [2026-04-01T18:18:47.937Z] PUT /api/admin/vacancies/1
+[0m[1][0m [2026-04-01T18:19:03.845Z] GET /api/applications
+[0m[1][0m [2026-04-01T18:19:03.885Z] GET /api/applications
+[0m[1][0m [2026-04-01T18:19:03.925Z] POST /api/vacancies
+[0m[1][0m [2026-04-01T18:19:03.972Z] GET /api/admin/users
+[0m[1][0m [2026-04-01T18:19:04.018Z] GET /api/companies
+[0m[1][0m [2026-04-01T18:19:04.077Z] GET /api/companies/1
+[0m[1][0m [2026-04-01T18:19:04.126Z] PUT /api/companies/profile
+[0m[1][0m [2026-04-01T18:19:13.932Z] PUT /api/job-seeker/profile
+[0m[1][0m [2026-04-01T18:19:13.991Z] POST /api/auth/register
+[0m[1][0m [2026-04-01T18:19:14.242Z] DELETE /api/admin/users/4
+[0m[1][0m [2026-04-01T18:19:14.388Z] DELETE /api/resumes/1
+[0m[1][0m [2026-04-01T18:19:14.521Z] GET /api/vacancies/1
+[0m[1][0m [2026-04-01T18:19:14.620Z] GET /api/vacancies/1
+[0m[1][0m [2026-04-01T18:19:14.734Z] GET /api/vacancies/1
+[0m[1][0m [2026-04-01T18:19:14.859Z] POST /api/auth/change-password
+[0m[1][0m [2026-04-01T18:19:21.160Z] GET /api/vacancies
+[0m[1][0m [2026-04-01T18:19:28.405Z] GET /api/vacancies
+[0m[1][0m [2026-04-01T18:20:02.509Z] GET /api/vacancies
+[0m[1][0m [2026-04-01T18:21:29.867Z] GET /api/vacancies
+[0m[1][0m [2026-04-01T18:24:40.489Z] GET /api/vacancies
+[0m[1][0m [2026-04-01T18:27:30.800Z] GET /api/vacancies
+[0m[1][0m [2026-04-01T18:29:32.256Z] GET /api/vacancies
+[0m[1][0m [2026-04-01T19:17:39.497Z] GET /api/vacancies

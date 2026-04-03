@@ -1,0 +1,117 @@
+
+> my-project@0.1.0 dev
+> concurrently "next dev --turbo -p 5000 -H 0.0.0.0" "tsx watch server/index.ts"
+
+[1G[0K[0m[0][0m [1m[38;2;173;127;168m▲ Next.js 16.1.6[39m[22m (Turbopack)
+[0m[0][0m - Local:         http://localhost:5000
+[0m[0][0m - Network:       http://0.0.0.0:5000
+[0m[0][0m - Environments: .env
+[0m[0][0m - Experiments (use with caution):
+[0m[0][0m   · serverActions
+[0m[0][0m 
+[0m[0][0m [32m[1m✓[22m[39m Starting...
+[0m[1][0m [dotenv@17.3.1] injecting env (3) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[0m[1][0m [API Server] ✓ Running on http://localhost:3001
+[0m[1][0m [API Server] ✓ Environment: development
+[0m[1][0m [API Server] ✓ Database: configured
+[0m[1][0m [API Server] ✓ Health check: http://localhost:3001/api/health
+[0m[0][0m [32m[1m✓[22m[39m Ready in 1711ms
+[0m[0][0m  GET / [32m200[39m in 1919ms[2m (compile: 1671ms, render: 248ms)[22m
+[0m[0][0m  GET / [32m200[39m in 1940ms[2m (compile: 1857ms, render: 82ms)[22m
+[0m[1][0m [2026-04-01T18:16:14.391Z] GET /api/vacancies
+[0m[1][0m [2026-04-01T18:16:19.028Z] GET /api/vacancies
+[0m[0][0m [33m[1m⚠[22m[39m Blocked cross-origin request from d0b2d072-14eb-474b-8cb5-2f4002196090-00-1gu7l8bvp623a.kirk.replit.dev to /_next/* resource. To allow this, configure "allowedDevOrigins" in next.config
+[0m[0][0m Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+[0m[1][0m [2026-04-01T18:16:26.975Z] GET /api/health
+[0m[1][0m [2026-04-01T18:16:34.251Z] GET /api/health
+[0m[1][0m [2026-04-01T18:16:41.557Z] POST /api/auth/register
+[0m[1][0m [2026-04-01T18:16:43.405Z] POST /api/auth/register
+[0m[1][0m [2026-04-01T18:16:44.872Z] POST /api/auth/register
+[0m[1][0m [2026-04-01T18:16:55.923Z] POST /api/auth/login
+[0m[1][0m [2026-04-01T18:16:56.037Z] POST /api/auth/login
+[0m[1][0m [2026-04-01T18:16:56.143Z] POST /api/auth/login
+[0m[1][0m [2026-04-01T18:17:05.811Z] POST /api/vacancies
+[0m[1][0m [2026-04-01T18:17:05.870Z] POST /api/vacancies
+[0m[1][0m [2026-04-01T18:17:09.528Z] GET /api/vacancies
+[0m[1][0m [2026-04-01T18:17:09.588Z] GET /api/vacancies
+[0m[1][0m [2026-04-01T18:17:09.648Z] GET /api/vacancies
+[0m[1][0m [2026-04-01T18:17:09.703Z] GET /api/vacancies/1
+[0m[0][0m  GET /login [32m200[39m in 125ms[2m (compile: 35ms, render: 90ms)[22m
+[0m[1][0m [2026-04-01T18:17:25.219Z] GET /api/vacancies
+[0m[1][0m [2026-04-01T18:17:25.287Z] POST /api/applications
+[0m[1][0m [2026-04-01T18:17:25.345Z] POST /api/applications
+[0m[1][0m [2026-04-01T18:17:25.398Z] POST /api/applications
+[0m[1][0m [2026-04-01T18:17:31.212Z] GET /api/applications
+[0m[1][0m [2026-04-01T18:17:31.269Z] GET /api/applications
+[0m[1][0m [2026-04-01T18:17:31.325Z] GET /api/applications/check/1
+[0m[1][0m [2026-04-01T18:17:31.391Z] GET /api/applications/check/999
+[0m[1][0m [2026-04-01T18:17:42.632Z] PUT /api/applications/1
+[0m[0][0m  GET / [32m200[39m in 48ms[2m (compile: 3ms, render: 45ms)[22m
+[0m[1][0m [2026-04-01T18:17:42.703Z] PUT /api/applications/1
+[0m[1][0m [2026-04-01T18:17:42.762Z] PUT /api/applications/2
+[0m[1][0m [2026-04-01T18:17:42.816Z] PUT /api/applications/1
+[0m[1][0m [2026-04-01T18:17:47.999Z] GET /api/employer/vacancies
+[0m[1][0m [2026-04-01T18:17:48.057Z] PUT /api/vacancies/1
+[0m[1][0m Error updating vacancy: error: null value in column "description" of relation "vacancies" violates not-null constraint
+[0m[1][0m     at [90m/home/runner/workspace/[39mnode_modules/[4mpg-pool[24m/index.js:45:11
+[0m[1][0m [90m    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
+[0m[1][0m     at async <anonymous> [90m(/home/runner/workspace/[39mserver/index.ts:613:20[90m)[39m {
+[0m[1][0m   length: [33m387[39m,
+[0m[1][0m   severity: [32m'ERROR'[39m,
+[0m[1][0m   code: [32m'23502'[39m,
+[0m[1][0m   detail: [32m'Failing row contains (1, 1, Senior Frontend Developer (React), null, 160000, 280000, USD, null, null, null, null, {React,TypeScript,CSS}, 1, 1, t, 2026-04-01 18:17:05.814189, 2026-04-01 18:17:48.058866).'[39m,
+[0m[1][0m   hint: [90mundefined[39m,
+[0m[1][0m   position: [90mundefined[39m,
+[0m[1][0m   internalPosition: [90mundefined[39m,
+[0m[1][0m   internalQuery: [90mundefined[39m,
+[0m[1][0m   where: [90mundefined[39m,
+[0m[1][0m   schema: [32m'public'[39m,
+[0m[1][0m   table: [32m'vacancies'[39m,
+[0m[1][0m   column: [32m'description'[39m,
+[0m[1][0m   dataType: [90mundefined[39m,
+[0m[1][0m   constraint: [90mundefined[39m,
+[0m[1][0m   file: [32m'execMain.c'[39m,
+[0m[1][0m   line: [32m'2011'[39m,
+[0m[1][0m   routine: [32m'ExecConstraints'[39m
+[0m[1][0m }
+[0m[1][0m [2026-04-01T18:17:48.120Z] PUT /api/vacancies/2
+[0m[1][0m Error updating vacancy: error: null value in column "title" of relation "vacancies" violates not-null constraint
+[0m[1][0m     at [90m/home/runner/workspace/[39mnode_modules/[4mpg-pool[24m/index.js:45:11
+[0m[1][0m [90m    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
+[0m[1][0m     at async <anonymous> [90m(/home/runner/workspace/[39mserver/index.ts:613:20[90m)[39m {
+[0m[1][0m   length: [33m320[39m,
+[0m[1][0m   severity: [32m'ERROR'[39m,
+[0m[1][0m   code: [32m'23502'[39m,
+[0m[1][0m   detail: [32m'Failing row contains (2, 1, null, null, null, null, USD, null, null, null, null, {}, 1, 0, f, 2026-04-01 18:17:05.87195, 2026-04-01 18:17:48.13064).'[39m,
+[0m[1][0m   hint: [90mundefined[39m,
+[0m[1][0m   position: [90mundefined[39m,
+[0m[1][0m   internalPosition: [90mundefined[39m,
+[0m[1][0m   internalQuery: [90mundefined[39m,
+[0m[1][0m   where: [90mundefined[39m,
+[0m[1][0m   schema: [32m'public'[39m,
+[0m[1][0m   table: [32m'vacancies'[39m,
+[0m[1][0m   column: [32m'title'[39m,
+[0m[1][0m   dataType: [90mundefined[39m,
+[0m[1][0m   constraint: [90mundefined[39m,
+[0m[1][0m   file: [32m'execMain.c'[39m,
+[0m[1][0m   line: [32m'2011'[39m,
+[0m[1][0m   routine: [32m'ExecConstraints'[39m
+[0m[1][0m }
+[0m[1][0m [2026-04-01T18:17:51.404Z] GET /api/vacancies
+[0m[1][0m [90m6:18:09 PM[39m [96m[tsx][39m [95mchange[39m in [92m./server/index.ts[39m [33mRestarting...[39m
+[0m[1][0m [API Server] SIGTERM received, shutting down gracefully...
+[0m[1][0m [API Server] Server closed
+[0m[1][0m c[dotenv@17.3.1] injecting env (3) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[0m[1][0m [API Server] ✓ Running on http://localhost:3001
+[0m[1][0m [API Server] ✓ Environment: development
+[0m[1][0m [API Server] ✓ Database: configured
+[0m[1][0m [API Server] ✓ Health check: http://localhost:3001/api/health
+[0m[0][0m  GET / [32m200[39m in 168ms[2m (compile: 125ms, render: 43ms)[22m
+[0m[0][0m  GET /vacancies [32m200[39m in 480ms[2m (compile: 383ms, render: 97ms)[22m
+[0m[0][0m  GET /login [32m200[39m in 50ms[2m (compile: 4ms, render: 46ms)[22m
+[0m[0][0m  GET / [32m200[39m in 41ms[2m (compile: 3ms, render: 38ms)[22m
+[0m[0][0m  GET / [32m200[39m in 43ms[2m (compile: 3ms, render: 40ms)[22m
+[0m[0][0m  GET / [32m200[39m in 45ms[2m (compile: 3ms, render: 43ms)[22m
+[0m[0][0m  GET / [32m200[39m in 38ms[2m (compile: 3ms, render: 36ms)[22m
+[0m[0][0m  GET / [32m200[39m in 37ms[2m (compile: 3ms, render: 35ms)[22m
+[0m[0][0m  GET / [32m200[39m in 37ms[2m (compile: 3ms, render: 34ms)[22m
